@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
 import React from "react";
@@ -26,12 +27,12 @@ const createApolloClient = authToken => {
     cache: new InMemoryCache()
   });
 };
-const App = () => {
+const App = ({idToken}) => {
   const { loading, logout } = useAuth0();
   if (loading) {
     return <div>Loading...</div>;
   }
-  const client = createApolloClient();
+  const client = createApolloClient(idToken);
   return (
     <ApolloProvider client={client}>
       <div>

@@ -8,6 +8,7 @@ import TodoFilters from "./TodoFilters";
 import gql from "graphql-tag";
 
 import { useQuery } from "@apollo/react-hooks";
+// graphql queries
 const GET_MY_TODO = gql`
   query getMyTodos {
     todos(
@@ -24,21 +25,7 @@ const GET_MY_TODO = gql`
 const TodoPrivateList = props => {
   const [state, setState] = useState({
     filter: "all",
-    clearInProgress: false,
-    todos: [
-      {
-        id: "1",
-        title: "This is private todo 1",
-        is_completed: true,
-        is_public: false
-      },
-      {
-        id: "2",
-        title: "This is private todo 2",
-        is_completed: false,
-        is_public: false
-      }
-    ]
+    clearInProgress: false
   });
 
   const filterResults = filter => {
@@ -50,11 +37,14 @@ const TodoPrivateList = props => {
 
   const clearCompleted = () => {};
 
-  let filteredTodos = state.todos;
+  //let filteredTodos = state.todos;
+  // eslint-disable-next-line react/prop-types
+  const { todos } = props;
+  let filteredTodos = todos;
   if (state.filter === "active") {
-    filteredTodos = state.todos.filter(todo => todo.is_completed !== true);
+    filteredTodos = todos.filter(todo => todo.is_completed !== true);
   } else if (state.filter === "completed") {
-    filteredTodos = state.todos.filter(todo => todo.is_completed === true);
+    filteredTodos = todos.filter(todo => todo.is_completed === true);
   }
 
   const todoList = [];
@@ -78,6 +68,8 @@ const TodoPrivateList = props => {
     </Fragment>
   );
 };
+// normally we use fetch to get the data and to make calls but here we will use useQuery hook to make a call 
+//and get the data 
 const ToDoPrivateListQuery = () => {
   const { loading, error, data } = useQuery(GET_MY_TODO);
   if (loading) {
@@ -90,4 +82,5 @@ const ToDoPrivateListQuery = () => {
   return <TodoPrivateList todos={data.todos} />;
 };
 
-export default TodoPrivateList;
+export default ToDoPrivateListQuery;
+export { GET_MY_TODO };
