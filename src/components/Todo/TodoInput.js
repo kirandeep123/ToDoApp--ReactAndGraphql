@@ -20,6 +20,8 @@ const INSERT_TODO = gql`
     }
   }
 `;
+
+
 const TodoInput = ({ isPublic = false }) => {
   // eslint-disable-next-line prettier/prettier
   let input;

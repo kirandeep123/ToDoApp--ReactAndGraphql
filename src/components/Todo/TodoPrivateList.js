@@ -7,7 +7,7 @@ import TodoFilters from "./TodoFilters";
 
 import gql from "graphql-tag";
 
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 // graphql queries
 const GET_MY_TODO = gql`
   query getMyTodos {
@@ -19,6 +19,15 @@ const GET_MY_TODO = gql`
       title
       created_at
       is_completed
+    }
+  }
+`;
+const DELETE_ALLTODOS = gql`
+  mutation {
+    delete_todos(
+      where: { is_completed: { _eq: true }, is_public: { _eq: false } }
+    ) {
+      affected_rows
     }
   }
 `;
@@ -34,8 +43,24 @@ const TodoPrivateList = props => {
       filter: filter
     });
   };
+  const [deleteAllCompletedToDos] = useMutation(DELETE_ALLTODOS);
 
-  const clearCompleted = () => {};
+  const clearCompleted = () => {
+    deleteAllCompletedToDos({
+      variables: {
+        is_completed: todos.is_completed,
+        is_public: todos.is_public
+      },
+      optimisticResponse: null,
+      update: (cache, { data }) => {
+        const existingTodos = cache.readQuery({ query: GET_MY_TODO });
+        const newTODOS = existingTodos.todos.filter(
+          t => t.is_completed === false
+        );
+        cache.writeQuery({ query: GET_MY_TODO, data: { todos: newTODOS } });
+      }
+    });
+  };
 
   //let filteredTodos = state.todos;
   // eslint-disable-next-line react/prop-types
@@ -68,8 +93,8 @@ const TodoPrivateList = props => {
     </Fragment>
   );
 };
-// normally we use fetch to get the data and to make calls but here we will use useQuery hook to make a call 
-//and get the data 
+// normally we use fetch to get the data and to make calls but here we will use useQuery hook to make a call
+//and get the data
 const ToDoPrivateListQuery = () => {
   const { loading, error, data } = useQuery(GET_MY_TODO);
   if (loading) {
